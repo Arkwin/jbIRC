@@ -1,0 +1,74 @@
+{
+  "name": "jbirc",
+  "productName": "jbIRC",
+  "version": "1.0.0",
+  "main": ".vite/build/main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "compile": "vite build -c vite.main.config.mjs --outDir .vite/build && vite build -c vite.preload.config.mjs --outDir .vite/build && vite build -c vite.renderer.config.mjs --outDir .vite/renderer/main_window",
+    "package": "npm run compile && electron-builder build --win --dir",
+    "make": "npm run compile && electron-builder build --win"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "irc-framework": "^4.14.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "socks": "^2.8.7"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.2.0",
+    "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-rpm": "^7.2.0",
+    "@electron-forge/maker-squirrel": "^7.2.0",
+    "@electron-forge/maker-zip": "^7.2.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
+    "@electron-forge/plugin-fuses": "^7.2.0",
+    "@electron-forge/plugin-vite": "^7.2.0",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.23",
+    "electron": "28.2.0",
+    "electron-builder": "^24.13.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "vite": "^5.0.12"
+  },
+  "build": {
+    "appId": "com.jbirc.client",
+    "icon": "icon.ico",
+    "productName": "jbIRC",
+    "compression": "maximum",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "package.json",
+      {
+        "from": ".vite",
+        "to": ".vite",
+        "filter": [
+          "**/*"
+        ]
+      },
+      "node_modules/**/*"
+    ],
+    "asarUnpack": [
+      "**/node_modules/irc-framework/**/*",
+      "**/node_modules/socks/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.social-networking",
+      "icon": "icon.icns"
+    },
+    "extraMetadata": {
+      "main": ".vite/build/main.js"
+    }
+    
+  }
+}
