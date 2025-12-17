@@ -18,7 +18,7 @@ export default function Chat({ connectionDetails, onDisconnect }) {
     const [inputText, setInputText] = useState('');
     
     const [users, setUsers] = useState([
-        { nick: connectionDetails.nick, mode: '@' },
+        { nick: connectionDetails.nick, mode: '@', client: connectionDetails.client },
     ]);
 
     const messagesEndRef = useRef(null);
@@ -54,6 +54,14 @@ export default function Chat({ connectionDetails, onDisconnect }) {
         };
     }, []);
 
+    const handleOpenLogs = (e) => {
+        e.preventDefault();
+
+        if (window.ircAPI) {
+            window.ircAPI.openLogs()
+        }
+    }
+
     const handleSend = (e) => {
         e.preventDefault();
         if (!inputText.trim()) return;
@@ -61,7 +69,8 @@ export default function Chat({ connectionDetails, onDisconnect }) {
         if (window.ircAPI) {
             window.ircAPI.sendMessage({
                 target: currentChannel,
-                message: inputText
+                message: inputText,
+                client: "jbIRC"
             });
         }
 
@@ -69,7 +78,8 @@ export default function Chat({ connectionDetails, onDisconnect }) {
             nick: connectionDetails.nick,
             message: inputText,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
-            type: 'message'
+            type: 'message',
+            client: connectionDetails.client
         }]);
 
         setInputText('');
@@ -78,14 +88,14 @@ export default function Chat({ connectionDetails, onDisconnect }) {
     return (
         <div className="flex h-full bg-black text-gray-300 font-sans text-sm overflow-hidden selection:bg-purple-900 selection:text-white">
             <div className="w-56 bg-neutral-900 border-r border-neutral-800 flex flex-col">
-                <div className="h-10 flex items-center px-4 bg-neutral-900 border-b border-neutral-800 font-semibold text-gray-100 tracking-wide">
+                <div className="h-10 flex justify-center items-center px-4 bg-neutral-900 border-b border-neutral-800 font-semibold text-gray-100 tracking-wide">
                     <div className="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
                     {connectionDetails.server}
                 </div>
                 
                 <div className="flex-1 overflow-y-auto py-2">
                     <div className="px-4 py-2 text-xs font-bold text-neutral-500 uppercase tracking-widest">Channels</div>
-                    <div className="mx-2 px-3 py-1 bg-neutral-800 text-white rounded border-l-2 border-purple-500 flex justify-between items-center cursor-pointer">
+                    <div className="mx-2 px-3 py-1 bg-neutral-800 text-white  border-l-2 border-purple-500 flex justify-between items-center cursor-pointer">
                         <span className="font-mono">{currentChannel}</span>
                     </div>
                 </div>
@@ -93,8 +103,8 @@ export default function Chat({ connectionDetails, onDisconnect }) {
                 <div className="p-3 bg-neutral-950 border-t border-neutral-800">
                     <div className="flex items-center justify-between">
                         <span className="font-mono text-purple-400 font-bold truncate">{connectionDetails.nick}</span>
-                        <button onClick={onDisconnect} className="text-xs text-red-500 hover:text-red-400 cursor-pointer">
-                            [ QUIT ]
+                        <button onClick={onDisconnect} className="flex justify-center align-middle text-xs font-bold text-red-500 hover:text-red-400 cursor-pointer">
+                            QUIT
                         </button>
                     </div>
                 </div>
@@ -102,7 +112,9 @@ export default function Chat({ connectionDetails, onDisconnect }) {
 
             <div className="flex-1 flex flex-col min-w-0 bg-black">
                 <div className="h-10 border-b border-neutral-800 flex items-center justify-between px-4 bg-neutral-950">
-                    
+                    <button className='font-mono text-orange-500 hover:text-orange-300' onClick={handleOpenLogs}>
+                        [ Open Logs ]
+                    </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-2 font-mono text-[13px] leading-6 custom-scrollbar">
@@ -155,10 +167,13 @@ export default function Chat({ connectionDetails, onDisconnect }) {
                 <div className="flex-1 overflow-y-auto p-2 font-mono text-xs">
                     {users.map((u, i) => (
                         <div key={i} className="px-2 py-1 text-gray-400 hover:bg-neutral-800 hover:text-gray-200 cursor-pointer rounded">
-                            <span className={`${u.mode === '@' ? 'text-yellow-500' : u.mode === '+' ? 'text-gray-300' : 'text-gray-500'} mr-1`}>
-                                {u.mode || ''}
-                            </span>
-                            {u.nick}
+                            <div className='flex justify-left align-middle gap-[2.5px]'>
+                                <span className={`${u.mode === '@' ? 'text-yellow-500' : u.mode === '+' ? 'text-gray-300' : 'text-gray-500'} mr-1`}>
+                                    {u.mode || ''}
+                                </span>
+
+                                {u.nick} {u.client && <img title='Active with jbIRC' width={20} src={`../${u.client}.png`}></img>}
+                            </div>
                         </div>
                     ))}
                 </div>

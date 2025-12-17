@@ -1,12 +1,35 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const Irc = require('irc-framework');
 const { SocksClient } = require('socks');
 const tls = require('tls');
 const net = require('net');
+const fs = require('fs');
 
 let mainWindow;
 let ircClient;
+
+function getLogPath() {
+  const logDir = path.join(app.getPath('userData'), 'logs');
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+  return path.join(logDir, 'chat_history.txt');
+}
+
+function writeToLog(type, nick, target, message) {
+  try {
+    const timestamp = new Date().toLocaleString(); 
+    // Format: [12/17/2025, 10:00:00 AM] [MSG] <Nick> (#channel): Message
+    const logLine = `[${timestamp}] [${type}] <${nick}> (${target}): ${message}\n`;
+    
+    fs.appendFile(getLogPath(), logLine, (err) => {
+      if (err) console.error("Failed to write to log:", err);
+    });
+  } catch (e) {
+    console.error("Logging Error:", e);
+  }
+}
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -50,7 +73,7 @@ ipcMain.handle('close-window', () => {
 
 ipcMain.handle('connect-irc', async (event, data) => {
 	console.log("Initializing Connection Protocol...", data);
-	const { nick, server, port, channels, tls: useTls, proxy } = data;
+	const { nick, server, port, channels, tls: useTls, proxy, client="jbIRC" } = data;
 	
 	if (ircClient) {
 		ircClient.quit();
@@ -80,18 +103,18 @@ ipcMain.handle('connect-irc', async (event, data) => {
 		}
 
 		if (useTls) {
-		console.log("Upgrading Socket to TLS...");
-		
-		const tlsOptions = {
-			host: server, 
-			rejectUnauthorized: false,
-			servername: server
-		};
+			console.log("Upgrading Socket to TLS...");
+			
+			const tlsOptions = {
+				host: server, 
+				rejectUnauthorized: false,
+				servername: server
+			};
 
-		if (transportSocket) {
-			tlsOptions.socket = transportSocket;
-			transportSocket = tls.connect(tlsOptions);
-		} 
+			if (transportSocket) {
+				tlsOptions.socket = transportSocket;
+				transportSocket = tls.connect(tlsOptions);
+			} 
 		}
 
 		if (transportSocket && useTls) {
@@ -126,28 +149,40 @@ ipcMain.handle('connect-irc', async (event, data) => {
 			connectOptions.port = port;
 			connectOptions.tls = useTls;
 			connectOptions.rejectUnauthorized = false;
+			connectOptions.client = client
 		}
 
 		ircClient.connect(connectOptions);
+
 
 		ircClient.on('registered', () => {
 			if (channels && channels.length > 0) {
 				channels.forEach(channel => ircClient.join(channel));
 			}
-
+			
+			writeToLog('SYS', 'System', 'Server', `Connected to ${server} as ${nick}`);
 			sendMessageToUI({ type: 'status', message: 'Connected' });
 		});
 
 		ircClient.on('join', (event) => {
+			writeToLog('SYS', event.nick, event.channel, 'Joined channel');
 			sendMessageToUI({ nick: event.nick, target: event.channel, message: 'joined', type: 'system' });
 		});
 
 		ircClient.on('message', (event) => {
-			sendMessageToUI({ nick: event.nick, target: event.target, message: event.message, type: 'message' });
+			writeToLog('MSG', event.nick, event.target, event.message);
+			
+			sendMessageToUI({ 
+				nick: event.nick, 
+				target: event.target, 
+				message: event.message, 
+				type: 'message' 
+			});
 		});
 
 	} catch (err) {
 		console.error("Connection Failed:", err);
+		writeToLog('ERR', 'System', 'Local', `Connection Failed: ${err.message}`);
 		const wins = BrowserWindow.getAllWindows();
 		if(wins[0]) wins[0].webContents.send('irc-status', `ERROR: ${err.message}`);
 	}
@@ -158,6 +193,8 @@ ipcMain.handle('connect-irc', async (event, data) => {
 ipcMain.handle('send-message', async (event, { target, message }) => {
 	if (ircClient) {
 		ircClient.say(target, message);
+
+		writeToLog('SENT', ircClient.user.nick, target, message);
 	}
 });
 
@@ -171,11 +208,16 @@ function sendMessageToUI(data) {
 				target: data.target,
 				message: data.message,
 				type: data.type,
-				time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+				time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+				client: "jbIRC"
 			});
 		}
 	}
 }
+
+ipcMain.handle('open-logs', () => {
+    shell.openPath(path.join(app.getPath('userData'), 'logs'));
+});
 
 app.on('ready', createWindow);
 

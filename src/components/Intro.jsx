@@ -9,6 +9,7 @@ export default function Intro({ onConnect }) {
 		port: 6697,
 		channels: '#TPP',
 		tls: true,
+		client: "jbIRC"
 	});
 
 	const [proxyConfig, setProxyConfig] = useState({

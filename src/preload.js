@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('ircAPI', {
     connect: (data) => ipcRenderer.invoke('connect-irc', data),
     sendMessage: (data) => ipcRenderer.invoke('send-message', data),
+    openLogs: () => ipcRenderer.invoke('open-logs'),
 
     onMessage: (callback) => {
         const subscription = (_event, value) => callback(value);
