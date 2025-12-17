@@ -1,10 +1,28 @@
 import { defineConfig } from 'vite';
 import pluginReact from '@vitejs/plugin-react';
+import path from 'path'; // Import path module
 
 export default defineConfig({
-  base: './', // Makes paths relative (e.g. "./assets/index.js")
+  base: './',
   plugins: [pluginReact()],
   build: {
+    minify: 'terser', 
+    terserOptions: {
+      compress: {
+        drop_console: true, 
+        drop_debugger: true
+      }
+    },
+    sourcemap: false,
     emptyOutDir: true,
+    rollupOptions: {
+      external: [
+        'irc-framework',
+        'electron',
+        'socks',
+        'net',
+        'tls'
+      ]
+    }
   },
 });

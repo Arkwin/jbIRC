@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
-    // Write to disk so we can see the files
     emptyOutDir: true, 
     lib: {
       entry: 'src/main.js',
@@ -10,7 +9,6 @@ export default defineConfig({
       formats: ['cjs'],
     },
     rollupOptions: {
-      // Don't bundle these; require them at runtime
       external: [
         'electron',
         'irc-framework',

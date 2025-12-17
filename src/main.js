@@ -10,7 +10,7 @@ let ircClient;
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
-		width: 1100, 
+		width: 1300, 
 		height: 800,
 		center: true,
 		frame: false,

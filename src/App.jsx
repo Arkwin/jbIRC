@@ -31,7 +31,7 @@ export default function App() {
 
     return (
         <div className="flex flex-col h-screen overflow-hidden bg-black">
-            <TitleBar />
+            {window.ircAPI && <TitleBar />}
             <div className="flex-1 overflow-hidden relative">
                 {!isConnected ? (
                     <Intro onConnect={handleConnect} />

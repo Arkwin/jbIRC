@@ -7,13 +7,21 @@
     "start": "electron-forge start",
     "compile": "vite build -c vite.main.config.mjs --outDir .vite/build && vite build -c vite.preload.config.mjs --outDir .vite/build && vite build -c vite.renderer.config.mjs --outDir .vite/renderer/main_window",
     "package": "npm run compile && electron-builder build --win --dir",
-    "make": "npm run compile && electron-builder build --win"
+    "make": "npm run compile && electron-builder build --win",
+    "build:mobile": "rimraf dist && vite build -c vite.renderer.config.mjs --outDir dist",
+    "sync:mobile": "npm run build:mobile && npx cap sync"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "capacitor-tcp-socket-plugin": "^0.0.4",
     "electron-squirrel-startup": "^1.0.0",
     "irc-framework": "^4.14.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "readable-stream": "^4.7.0",
     "socks": "^2.8.7"
   },
   "devDependencies": {
@@ -35,6 +43,13 @@
     "vite": "^5.0.12"
   },
   "build": {
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "jbIRC"
+    },
     "appId": "com.jbirc.client",
     "icon": "icon.ico",
     "productName": "jbIRC",
@@ -69,6 +84,10 @@
     "extraMetadata": {
       "main": ".vite/build/main.js"
     }
-    
+  },
+  "author": {
+    "name": "Jonathan (Jb) Mauler",
+    "email": "jonathan@thejbassociation.com",
+    "url": "https://biography.gg/Jb"
   }
 }
