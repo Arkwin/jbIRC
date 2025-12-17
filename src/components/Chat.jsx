@@ -172,7 +172,7 @@ export default function Chat({ connectionDetails, onDisconnect }) {
                                     {u.mode || ''}
                                 </span>
 
-                                {u.nick} {u.client && <img title='Active with jbIRC' width={20} src={`../jbIRC.png`}></img>}
+                                {u.nick} {u.client && <img title='Active with jbIRC' width={20} src="https://cdn.nest.rip/uploads/4e8c88d9-4ae1-428d-b5e6-632ef5962865.png"></img>}
                             </div>
                         </div>
                     ))}
