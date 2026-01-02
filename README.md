@@ -9,7 +9,7 @@ jbIRC is a modern, user friendly IRC client built around privacy and security. D
 ## 🚀 Features
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/Jbablestime/jbIRC)
 
-**Proxy Support**: Join IRC servers with ease knowing your requests are being routed through a proxy. Supporst SOCKS4/5, HTTP, and Tor!  
+**Proxy Support**: Join IRC servers with ease knowing your requests are being routed through a proxy. Supports SOCKS4/5, HTTP, and Tor!  
 **SSL Encyption**: Your messages are encrypted end-to-end, ensuring a SSL/TLS connection is established before anything.  
 **Lightweight**: Built at only 81MB, jbIRC is built only on the essential services and dependencies.  
 **Cross-Platform**: jbIRC supports being built into Windows (.exe), MacOS  (.dmg), and Linux (.AppImage) executables.
