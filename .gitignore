@@ -93,3 +93,6 @@ out/
 
 # Production
 dist/
+
+# Development
+wss/

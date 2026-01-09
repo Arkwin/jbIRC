@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Intro from './components/Intro';
+import Auth from './components/Auth';
 import Chat from './components/Chat';
 import TitleBar from './components/TitleBar';
 
@@ -98,7 +98,7 @@ export default function App() {
             <div className="flex-1 relative overflow-hidden">
                 
                 <div className={`absolute inset-0 transition-all duration-500 ease-in-out transform ${getIntroStyle()}`}>
-                    <Intro onConnect={handleConnect} />
+                    <Auth onConnect={handleConnect} />
                 </div>
 
                 <div className={`absolute inset-0 flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm transition-all duration-200 ease-out transform ${getConnectingStyle()}`}>

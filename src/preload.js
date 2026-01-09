@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('ircAPI', {
     sendMessage: (data) => ipcRenderer.invoke('send-message', data),
     openLogs: () => ipcRenderer.invoke('open-logs'),
 
+    onAuthError: (callback) => ipcRenderer.on('auth-error', (_event, value) => callback(value)),
+
     onMessage: (callback) => {
         const subscription = (_event, value) => callback(value);
         ipcRenderer.on('irc-message', subscription);
